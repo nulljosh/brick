@@ -1,1 +1,1 @@
-/Users/joshua/Documents/Code/roost/CLAUDE.md
+CLAUDE.md
