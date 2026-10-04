@@ -17,6 +17,8 @@ data class Place(
     val countryCode: String,
     val lat: Double,
     val lng: Double,
+    // The town a neighbourhood belongs to; the listing feeds index by town.
+    val area: String = "",
 )
 
 val DEFAULT_PLACE = Place(
@@ -30,12 +32,14 @@ private data class NominatimAddress(
     val city: String? = null,
     val town: String? = null,
     val village: String? = null,
+    val municipality: String? = null,
 )
 
 @Serializable
 private data class NominatimResult(
     @SerialName("place_id") val placeId: Long,
     @SerialName("display_name") val displayName: String,
+    val name: String? = null,
     val lat: String,
     val lon: String,
     val address: NominatimAddress? = null,
@@ -61,7 +65,8 @@ class GeoClient {
             parameter("featureType", "settlement")
         }.body()
         return results.filter { it.boundingbox != null }.map { r ->
-            val name = r.address?.city ?: r.address?.town ?: r.address?.village ?: r.displayName.substringBefore(",")
+            val town = r.address?.city ?: r.address?.town ?: r.address?.municipality ?: r.address?.village ?: ""
+            val name = r.name?.takeIf { it.isNotBlank() } ?: r.displayName.substringBefore(",")
             Place(
                 id = r.placeId.toString(),
                 name = name,
@@ -69,6 +74,7 @@ class GeoClient {
                 countryCode = (r.address?.countryCode ?: "").uppercase(),
                 lat = r.lat.toDoubleOrNull() ?: 0.0,
                 lng = r.lon.toDoubleOrNull() ?: 0.0,
+                area = town,
             )
         }
     }
