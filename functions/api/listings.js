@@ -45,13 +45,17 @@ async function rentcast(env, p) {
 // is capped and the whole response is cached below.
 async function housingfeed(env, p) {
   if (!env.APIFY_TOKEN || p.mode !== 'rent' || !p.city) return []
+  // HousingFeed says UK where ISO says GB.
+  const country = p.country === 'GB' ? 'UK' : p.country
   const url = `https://api.apify.com/v2/acts/housingfeed~rental-listings-api/run-sync-get-dataset-items?token=${env.APIFY_TOKEN}`
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ country: p.country, city: p.city, maxItems: 60 }),
+    body: JSON.stringify({ country, city: p.city, maxItems: 60 }),
     signal: AbortSignal.timeout(25000)
   })
+  // 400 is how it answers a country outside its list: not covered, not broken.
+  if (res.status === 400) return []
   if (!res.ok) throw new Error(`housingfeed ${res.status}`)
   return (await res.json()).filter(r => r.lat && r.lng && (r.rent_min || r.rent_max)).map(r => {
     const photos = (r.images?.length ? r.images : [r.image]).filter(Boolean)

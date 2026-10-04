@@ -49,7 +49,9 @@ export function PlaceProvider({ children }) {
     return () => controller.abort()
   }, [place.id, mode])
 
-  const isLive = live.length > 0
+  // ponytail: a feed that returns a handful of homes for a whole city reads as
+  // broken, so below this the labeled samples stand in. Tune if feeds get denser.
+  const isLive = live.length >= 5
   const listings = isLive ? live : generateListings(place, streets, mode)
 
   function setPlace(next) {
