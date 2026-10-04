@@ -104,7 +104,9 @@ export async function onRequestGet({ request, env }) {
     }
   }))).flat()
 
-  const res = Response.json({ listings: out, sources }, { headers: { 'cache-control': `public, max-age=${out.length ? TTL : 300}` } })
+  // Lets the native app hide Buy until a sale feed is switched on.
+  const modes = env.RENTCAST_KEY ? ['rent', 'sale'] : ['rent']
+  const res = Response.json({ listings: out, sources, modes }, { headers: { 'cache-control': `public, max-age=${out.length ? TTL : 300}` } })
   await caches.default.put(key, res.clone())
   return res
 }
