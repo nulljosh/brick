@@ -20,6 +20,12 @@ struct Listing: Codable, Identifiable, Hashable, Sendable {
     let photos: [String]
     let year: Int?
     let listedDaysAgo: Int?
+    // Percent under the median for the same bedroom count, set by Store. Same rule as src/lib/deals.js.
+    var deal = 0
+
+    private enum CodingKeys: String, CodingKey {
+        case id, source, url, address, city, currency, imperial, mode, price, beds, baths, sqft, type, lat, lng, photos, year, listedDaysAgo
+    }
 
     var priceText: String {
         let p = price.formatted(.currency(code: currency).precision(.fractionLength(0)))
@@ -109,7 +115,7 @@ final class Store {
         do {
             let (data, _) = try await URLSession.shared.data(from: c.url!)
             let feed = try JSONDecoder().decode(Feed.self, from: data)
-            listings = feed.listings.compactMap(\.value)
+            listings = Self.rankByDeal(feed.listings.compactMap(\.value))
             if let m = feed.modes, !m.isEmpty { modes = m }
         } catch is CancellationError {
         } catch {
@@ -117,6 +123,19 @@ final class Store {
             listings = []
             failed = true
         }
+    }
+
+    static func rankByDeal(_ homes: [Listing]) -> [Listing] {
+        let byBeds = Dictionary(grouping: homes, by: { Int($0.beds) }).mapValues { $0.map(\.price).sorted() }
+        return homes.map { l in
+            var l = l
+            let p = byBeds[Int(l.beds)] ?? []
+            let typical = p.count < 3 ? 0 : (p.count % 2 == 1 ? p[p.count / 2] : (p[p.count / 2 - 1] + p[p.count / 2]) / 2)
+            let isRoom = (l.address ?? "").range(of: #"\broom\b"#, options: [.regularExpression, .caseInsensitive]) != nil
+            l.deal = typical > 0 && !isRoom ? Int(((typical - l.price) / typical * 100).rounded()) : 0
+            return l
+        }
+        .sorted { $0.deal > $1.deal }
     }
 
     func search(_ query: String) async -> [Place] {

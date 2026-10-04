@@ -10,6 +10,9 @@ function median(values) {
   return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2
 }
 
+// A single room in a shared house is not comparable to a whole unit.
+const room = /\broom\b/i
+
 export function scoreDeals(listings) {
   const groups = new Map()
   for (const l of listings) {
@@ -19,7 +22,7 @@ export function scoreDeals(listings) {
   }
   return listings.map(l => {
     const prices = groups.get(Math.floor(l.beds))
-    const typical = prices.length >= 3 ? median(prices) : 0
+    const typical = prices.length >= 3 && !room.test(l.address || '') ? median(prices) : 0
     return { ...l, deal: typical ? Math.round(((typical - l.price) / typical) * 100) : 0 }
   })
 }

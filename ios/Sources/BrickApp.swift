@@ -148,7 +148,16 @@ struct ListingRow: View {
                 .frame(width: 96, height: 72)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 3) {
-                Text(listing.priceText).font(.headline)
+                HStack(spacing: 6) {
+                    Text(listing.priceText).font(.headline)
+                    if listing.deal >= 5 {
+                        Text("\(listing.deal)% under typical")
+                            .font(.caption2.weight(.semibold))
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(.green.opacity(0.14), in: Capsule())
+                            .foregroundStyle(.green)
+                    }
+                }
                 Text(listing.statsText).font(.subheadline).foregroundStyle(.secondary)
                 Text(listing.address ?? listing.city ?? "").font(.footnote).foregroundStyle(.secondary).lineLimit(1)
             }
@@ -174,6 +183,9 @@ struct ListingDetail: View {
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(listing.priceText).font(.largeTitle.bold())
+                    if listing.deal >= 5 {
+                        Text("\(listing.deal)% under typical for its size nearby").font(.subheadline.weight(.semibold)).foregroundStyle(.green)
+                    }
                     Text(listing.statsText).font(.title3).foregroundStyle(.secondary)
                     Text(listing.address ?? listing.city ?? "")
                     if let days = listing.listedDaysAgo {

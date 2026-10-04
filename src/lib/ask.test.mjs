@@ -19,4 +19,6 @@ const homes = [1000, 2000, 3000].map((price, i) => ({ id: i, beds: 2, price }))
 const scored = scoreDeals([...homes, { id: 9, beds: 5, price: 100 }])
 assert.deepEqual(scored.map(l => l.deal), [50, 0, -50, 0], 'scored against the same bedroom count; lone homes score 0')
 
+assert.equal(scoreDeals([...homes, { id: 'r', beds: 2, price: 500, address: '7430 Angus Drive Room B' }]).at(-1).deal, 0, 'rooms are not deals')
+
 console.log('ask + deals: ok')
