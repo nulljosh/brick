@@ -12,7 +12,7 @@ import './Listings.css'
 export default function Listings() {
   const { filters } = useFilters()
   const { favorites, favoriteSet } = useFavorites()
-  const { place, listings, streetsUnavailable } = usePlace()
+  const { place, listings, isLive, streetsUnavailable } = usePlace()
   const { t } = useI18n()
 
   const filtered = useMemo(
@@ -23,8 +23,8 @@ export default function Listings() {
   return (
     <div className="page">
       <FilterBar resultCount={filtered.length} />
-      <p className="listings-notice">{t('sample_listings')}</p>
-      {streetsUnavailable && <p className="listings-notice">{t('approx_locations')}</p>}
+      {!isLive && <p className="listings-notice">{t('sample_listings')}</p>}
+      {!isLive && streetsUnavailable && <p className="listings-notice">{t('approx_locations')}</p>}
       <MapView listings={filtered} favorites={favorites} place={place} />
       <div className="listings-grid">
         {filtered.map((listing, i) => (

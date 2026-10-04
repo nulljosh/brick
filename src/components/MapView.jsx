@@ -39,7 +39,7 @@ function MapMarkers({ listings, favorites }) {
       >
         <Popup className="roost-popup">
           <div className="popup-content">
-            <img src={listing.photo} alt="" />
+            {listing.photo && <img src={listing.photo} alt="" />}
             <div className="popup-info">
               <strong>{fmt.price}</strong>
               <span>{listing.beds} {t('bd')} / {listing.baths} {t('ba')} / {fmt.area}</span>

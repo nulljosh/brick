@@ -36,8 +36,11 @@ Cloudflare Pages project `roost` (roost.heyitsmejosh.com), direct upload:
 npm run build && npx wrangler pages deploy dist --project-name=roost --branch=main
 ```
 
-Env vars live in the local `.env` and are baked into the bundle, not set in the
-Pages dashboard.
+Supabase vars live in the local `.env` and are baked into the bundle. Listing keys
+are Pages secrets read by `functions/api/listings.js`, never in the bundle:
+`npx wrangler pages secret put RENTCAST_KEY --project-name=roost` (US sale + rent),
+`APIFY_TOKEN` (HousingFeed rentals, 30 countries). With no key the app shows
+sample homes, labeled as samples.
 
 ## Key Files
 
@@ -51,5 +54,6 @@ Pages dashboard.
 - src/components/MapView.jsx: Leaflet map with price pill markers
 - src/lib/geo.js: Nominatim place search + Overpass streets (mirrors, 30d cache)
 - src/lib/mapPins.js: Which pins survive at a given zoom
+- functions/api/listings.js: Live listings proxy (RentCast, HousingFeed), 6h edge cache
 - src/data/listings.js: Per-place seeded listing generation (MLS/IDX shape)
 - src/pages/: Landing, Login, Register, ForgotPassword, Listings, ListingDetail, Settings

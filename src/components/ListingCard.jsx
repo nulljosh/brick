@@ -17,7 +17,7 @@ export default function ListingCard({ listing, index = 0 }) {
       style={{ animationDelay: `${(index % 12) * 0.04}s` }}
     >
       <div className="listing-card-img">
-        <img src={listing.photo} alt={listing.address} loading="lazy" />
+        {listing.photo && <img src={listing.photo} alt={listing.address} loading="lazy" />}
         <button
           className={`fav-btn ${fav ? 'active' : ''}`}
           onClick={e => { e.preventDefault(); toggle(listing.id) }}

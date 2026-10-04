@@ -32,7 +32,7 @@ export default function ListingDetail() {
       <div className="detail-layout fade-up">
         <div className="detail-gallery">
           <div className="detail-main-photo">
-            <img src={listing.photos[photoIdx]} alt={listing.address} />
+            {listing.photos[photoIdx] && <img src={listing.photos[photoIdx]} alt={listing.address} />}
             <button className="detail-back" onClick={() => navigate(-1)}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -79,10 +79,12 @@ export default function ListingDetail() {
               <span className="detail-stat-value">{fmt.area}</span>
               <span className="detail-stat-label">{t('area')}</span>
             </div>
-            <div className="detail-stat">
-              <span className="detail-stat-value">{listing.year}</span>
-              <span className="detail-stat-label">{t('year_built')}</span>
-            </div>
+            {listing.year && (
+              <div className="detail-stat">
+                <span className="detail-stat-value">{listing.year}</span>
+                <span className="detail-stat-label">{t('year_built')}</span>
+              </div>
+            )}
           </div>
 
 
@@ -90,7 +92,8 @@ export default function ListingDetail() {
             <h3 className="section-label">{t('features')}</h3>
             <div className="detail-meta-grid">
               <div><span className="detail-meta-label">{t('type')}</span><span className="detail-meta-value">{t(listing.type)}</span></div>
-              <div><span className="detail-meta-label">#</span><span className="detail-meta-value">{listing.refNumber}</span></div>
+              {listing.refNumber && <div><span className="detail-meta-label">#</span><span className="detail-meta-value">{listing.refNumber}</span></div>}
+              {listing.source && <div><span className="detail-meta-label">via</span><span className="detail-meta-value">{listing.url ? <a href={listing.url} target="_blank" rel="noopener noreferrer">{listing.source}</a> : listing.source}</span></div>}
               <div><span className="detail-meta-label">{t('sort_newest')}</span><span className="detail-meta-value">{t('listed_ago', { n: listing.listedDaysAgo })}</span></div>
             </div>
           </div>
