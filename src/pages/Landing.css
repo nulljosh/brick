@@ -240,3 +240,27 @@
 }
 
 .landing-footer a { color: var(--text2); }
+
+.demo-frame {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.35);
+}
+
+.demo-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.demo-bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.demo-bar span { margin-inline-start: 12px; font-size: 0.8rem; color: var(--text2); }
+
+.demo-frame video { display: block; width: 100%; aspect-ratio: 16 / 10; background: var(--bg2); }
+
+.demo-caption { margin-top: 1rem; color: var(--text2); max-width: 60ch; }

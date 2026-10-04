@@ -40,6 +40,9 @@ export const en = {
   area: 'Area',
   year_built: 'Year built',
   approx_locations: 'Map data is unavailable right now, so these homes are placed approximately.',
+  demo_label: 'See it work',
+  demo_title: 'Thirty seconds, every feature',
+  demo_caption: 'Recorded in the real app, on real Brookswood rentals. Search a town, ask in plain words, read the deals, save the good ones, switch languages.',
   live_listings: 'Real rentals in Vancouver, live from the feed.',
   fetching_listings: 'Pulling live listings for {place}. The first look at a new place takes a few seconds.',
   sample_listings: 'Sample listings generated for exploration. These are not homes for sale or rent.',
@@ -62,7 +65,7 @@ export const en = {
   forgot_password: 'Forgot password?',
   save: 'Save',
   saved: 'Saved',
-  landing_pitch: 'Homes for sale and for rent, anywhere on earth. Search any city and read every price in the local currency, in your own language.',
+  landing_pitch: 'Real rentals on a map. Search any town, ask for what you want in plain words, and read every price in the local currency, in your own language.',
 
   // Landing page. Untranslated locales fall back to English, which is safe.
   stat_countries: 'countries mapped',

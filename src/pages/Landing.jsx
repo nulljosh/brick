@@ -57,6 +57,16 @@ export default function Landing() {
     ['feat_rent_title', 'feat_rent_body']
   ]
 
+  // The demo plays only while it is on screen, and never for reduced motion.
+  const demoRef = useRef(null)
+  useEffect(() => {
+    const v = demoRef.current
+    if (!v || prefersReducedMotion() || !('IntersectionObserver' in window)) return
+    const io = new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => {}) : v.pause()), { threshold: 0.4 })
+    io.observe(v)
+    return () => io.disconnect()
+  }, [])
+
   // Three real rentals for the hero, from the same feed the app uses.
   const [live, setLive] = useState(null)
   useEffect(() => {
@@ -93,6 +103,27 @@ export default function Landing() {
           <img src={live ? thumb(live[2].photo, 480) : photos[2]} alt="" />
           <span>{live ? t('live_listings') : t('sample_listings')}</span>
         </div>
+      </section>
+
+      <section className="landing-section landing-demo">
+        <p className="section-label">{t('demo_label')}</p>
+        <h2>{t('demo_title')}</h2>
+        <div className="demo-frame">
+          <div className="demo-bar" aria-hidden="true"><i /><i /><i /><span>brick.heyitsmejosh.com</span></div>
+          <video
+            ref={demoRef}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            poster="/promo/poster.jpg"
+            aria-label={t('demo_title')}
+          >
+            <source src="/promo/brick.webm" type="video/webm" />
+            <source src="/promo/brick.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <p className="demo-caption">{t('demo_caption')}</p>
       </section>
 
       <section className={`landing-stats reveal${statsIn ? ' in-view' : ''}`} ref={statsRef}>
