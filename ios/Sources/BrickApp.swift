@@ -7,59 +7,105 @@ struct BrickApp: App {
 
     var body: some Scene {
         WindowGroup {
-            TabView {
-                BrowseView().tabItem { Label("Browse", systemImage: "map") }
-                SavedView().tabItem { Label("Saved", systemImage: "heart") }
-            }
-            .environment(store)
+            BrowseView().environment(store)
         }
     }
 }
 
+// The map fills the screen. Listings live in a glass sheet that rides over it,
+// the way Maps does it: drag it down for the map, up for the list.
 struct BrowseView: View {
     @Environment(Store.self) private var store
+    @State private var camera: MapCameraPosition = .automatic
+    @State private var sheet = true
+    @State private var detent: PresentationDetent = .fraction(0.45)
+
+    var body: some View {
+        Map(position: $camera) {
+            ForEach(store.listings) { l in
+                Annotation(l.priceText, coordinate: .init(latitude: l.lat, longitude: l.lng)) {
+                    PricePill(text: l.priceText, deal: l.deal >= 5)
+                }
+                .annotationTitles(.hidden)
+            }
+        }
+        .mapStyle(.standard(pointsOfInterest: .excludingAll))
+        .ignoresSafeArea()
+        .sheet(isPresented: $sheet) {
+            ListingSheet(detent: $detent)
+                .presentationDetents([.height(120), .fraction(0.45), .large], selection: $detent)
+                .presentationBackgroundInteraction(.enabled(upThrough: .fraction(0.45)))
+                .presentationCornerRadius(28)
+                .interactiveDismissDisabled()
+                .glassSheetBackground()
+        }
+        .task(id: "\(store.place.id)-\(store.mode)") {
+            store.listings = []
+            camera = .region(.init(center: .init(latitude: store.place.lat - 0.04, longitude: store.place.lng),
+                                   span: .init(latitudeDelta: 0.22, longitudeDelta: 0.22)))
+            await store.load()
+        }
+    }
+}
+
+extension View {
+    // iOS 26 sheets are Liquid Glass at partial heights on their own; earlier
+    // systems get the thin material so the map still shows through.
+    @ViewBuilder func glassSheetBackground() -> some View {
+        if #available(iOS 26, *) { self } else { presentationBackground(.ultraThinMaterial) }
+    }
+
+    @ViewBuilder func glassPill() -> some View {
+        if #available(iOS 26, *) { glassEffect(.regular, in: Capsule()) } else { background(.ultraThinMaterial, in: Capsule()) }
+    }
+}
+
+struct ListingSheet: View {
+    @Environment(Store.self) private var store
+    @Binding var detent: PresentationDetent
     @State private var query = ""
     @State private var results: [Place] = []
-    @State private var camera: MapCameraPosition = .automatic
-    @State private var selected: Listing?
 
     var body: some View {
         @Bindable var store = store
         NavigationStack {
-            VStack(spacing: 0) {
-                Map(position: $camera) {
-                    ForEach(store.listings) { l in
-                        Annotation(l.priceText, coordinate: .init(latitude: l.lat, longitude: l.lng)) {
-                            Button { selected = l } label: { PricePill(text: l.priceText) }.buttonStyle(.plain)
-                        }
-                        .annotationTitles(.hidden)
+            Group {
+                if store.loading && store.listings.isEmpty {
+                    VStack(spacing: 12) {
+                        ProgressView()
+                        Text("Pulling live listings for \(store.place.name)").font(.footnote).foregroundStyle(.secondary)
                     }
-                }
-                .frame(maxHeight: 260)
-
-                Group {
-                    if store.loading && store.listings.isEmpty {
-                        ProgressView().frame(maxHeight: .infinity)
-                    } else if store.listings.isEmpty {
-                        ContentUnavailableView(
-                            store.failed ? "Could not load listings" : "No listings here yet",
-                            systemImage: store.failed ? "wifi.slash" : "house",
-                            description: Text(store.failed ? "Check your connection and pull to try again." : "Brick only shows real listings. Try a bigger city nearby.")
-                        )
-                    } else {
-                        List(store.listings) { l in
-                            NavigationLink(value: l) { ListingRow(listing: l) }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if store.listings.isEmpty {
+                    ContentUnavailableView(
+                        store.failed ? "Could not load listings" : "No listings here yet",
+                        systemImage: store.failed ? "wifi.slash" : "house",
+                        description: Text(store.failed ? "Check your connection and pull to try again." : "Brick only shows real listings. Try a bigger town nearby.")
+                    )
+                } else {
+                    List {
+                        Section {
+                            ForEach(store.listings) { l in
+                                NavigationLink(value: l) { ListingRow(listing: l) }
+                                    .listRowBackground(Color.clear)
+                            }
+                        } header: {
+                            Text("\(store.listings.count) real homes, best deals first")
                         }
-                        .listStyle(.plain)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
                 }
-                .refreshable { await store.load() }
             }
+            .refreshable { await store.load() }
             .navigationTitle(store.place.name)
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: Listing.self) { ListingDetail(listing: $0) }
-            .navigationDestination(item: $selected) { ListingDetail(listing: $0) }
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    NavigationLink { SavedView() } label: { Image(systemName: "heart") }
+                        .accessibilityLabel("Saved homes")
+                }
                 if store.modes.count > 1 {
                     ToolbarItem(placement: .topBarTrailing) {
                         Picker("Mode", selection: $store.mode) {
@@ -70,13 +116,14 @@ struct BrowseView: View {
                     }
                 }
             }
-            .searchable(text: $query, prompt: "Search any city")
+            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Search any town")
             .searchSuggestions {
                 ForEach(results) { p in
                     Button {
                         store.place = p
                         query = ""
                         results = []
+                        detent = .fraction(0.45)
                     } label: {
                         VStack(alignment: .leading) {
                             Text(p.name)
@@ -92,27 +139,20 @@ struct BrowseView: View {
                 guard !Task.isCancelled else { return }
                 results = await store.search(query)
             }
-            .task(id: "\(store.place.id)-\(store.mode)") {
-                store.listings = []
-                camera = .region(.init(center: .init(latitude: store.place.lat, longitude: store.place.lng),
-                                       span: .init(latitudeDelta: 0.12, longitudeDelta: 0.12)))
-                await store.load()
-                // App Store screenshots: `-shot-detail` opens the first home.
-                if ProcessInfo.processInfo.arguments.contains("-shot-detail") { selected = store.listings.first }
-            }
         }
     }
 }
 
 struct PricePill: View {
     let text: String
+    var deal = false
 
     var body: some View {
         Text(text)
             .font(.caption2.weight(.semibold))
-            .padding(.horizontal, 7).padding(.vertical, 4)
-            .background(.background, in: Capsule())
-            .overlay(Capsule().stroke(.tint, lineWidth: 1))
+            .padding(.horizontal, 8).padding(.vertical, 5)
+            .glassPill()
+            .overlay(Capsule().stroke(deal ? Color.green : Color.accentColor, lineWidth: deal ? 1.5 : 1))
             .foregroundStyle(.primary)
     }
 }
@@ -228,22 +268,21 @@ struct SavedView: View {
     @Environment(Store.self) private var store
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if store.saved.isEmpty {
-                    ContentUnavailableView("Nothing saved", systemImage: "heart", description: Text("Tap the heart on a home to keep it here."))
-                } else {
-                    List {
-                        ForEach(store.saved) { l in
-                            NavigationLink(value: l) { ListingRow(listing: l) }
-                        }
-                        .onDelete { store.saved.remove(atOffsets: $0) }
+        Group {
+            if store.saved.isEmpty {
+                ContentUnavailableView("Nothing saved", systemImage: "heart", description: Text("Tap the heart on a home to keep it here."))
+            } else {
+                List {
+                    ForEach(store.saved) { l in
+                        NavigationLink(value: l) { ListingRow(listing: l) }
+                            .listRowBackground(Color.clear)
                     }
-                    .listStyle(.plain)
+                    .onDelete { store.saved.remove(atOffsets: $0) }
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
             }
-            .navigationTitle("Saved")
-            .navigationDestination(for: Listing.self) { ListingDetail(listing: $0) }
         }
+        .navigationTitle("Saved")
     }
 }

@@ -132,7 +132,9 @@ final class Store {
             let p = byBeds[Int(l.beds)] ?? []
             let typical = p.count < 3 ? 0 : (p.count % 2 == 1 ? p[p.count / 2] : (p[p.count / 2 - 1] + p[p.count / 2]) / 2)
             let isRoom = (l.address ?? "").range(of: #"\broom\b"#, options: [.regularExpression, .caseInsensitive]) != nil
-            l.deal = typical > 0 && !isRoom ? Int(((typical - l.price) / typical * 100).rounded()) : 0
+            let deal = typical > 0 && !isRoom ? Int(((typical - l.price) / typical * 100).rounded()) : 0
+            // Over 60% under is almost always a room share or a typo, not a find.
+            l.deal = deal > 60 ? 0 : deal
             return l
         }
         .sorted { $0.deal > $1.deal }

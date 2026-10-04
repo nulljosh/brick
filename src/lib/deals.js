@@ -23,6 +23,8 @@ export function scoreDeals(listings) {
   return listings.map(l => {
     const prices = groups.get(Math.floor(l.beds))
     const typical = prices.length >= 3 && !room.test(l.address || '') ? median(prices) : 0
-    return { ...l, deal: typical ? Math.round(((typical - l.price) / typical) * 100) : 0 }
+    const deal = typical ? Math.round(((typical - l.price) / typical) * 100) : 0
+    // Over 60% under is almost always a room share or a typo, not a find.
+    return { ...l, deal: deal > 60 ? 0 : deal }
   })
 }
