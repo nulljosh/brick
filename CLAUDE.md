@@ -28,6 +28,10 @@ see.
 Auth reads `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` at build time. Without
 them `authConfigured` is false and every sign-in shows "not configured".
 
+## The loop
+
+Current resume state: `docs/LOOP-HANDOFF.md`. This is the App Store push for Brick iOS.
+
 ## Deploy
 
 Cloudflare Pages project `roost` (brick.heyitsmejosh.com; roost.heyitsmejosh.com still resolves), direct upload:

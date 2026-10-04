@@ -1,60 +1,35 @@
 # Brick Roadmap
 
-## App Store push 2026-09-03
-- [ ] Not yet in App Store Connect. Next steps: asc-name-creator probe (Roost
-      itself not checked), native iOS/macOS build, signing, screenshots, ASC
-      record creation, submit. Multi-hour job, own session.
-- [ ] Positioning ammo from a competitor scan: Zillow reviews complain about
-      broken saved commute filters, removed sold-price history, forced AI
-      tagging over manual tags. Roost's edge if/when shipped: keep price
-      history and manual tags simple and reliable.
+## App Store push 2026-10-04 (paused, resume at home)
+- [ ] ASC record creation paused. Apple's web sign-in returned 503 at 13:07 and 13:32 (no verification code). Resume after 14:32 (one hour throttle window). Joshua runs asc-login at home, then asc web apps create for com.nulljosh.brick named Brick. iPhone IPA built, signed, ready to export and upload.
+- [ ] RentCast API key pending Joshua signup (US sale and rent data feeds already wired, APIFY_TOKEN for HousingFeed 30 countries already configured).
 
-## Braindump 2026-08-19
-- [ ] Rename? "Roost" may not be the final name, run asc-name-creator for alternatives before any App Store record is made.
-
-## From Apple Notes (imported 2026-08-27)
-- [ ] Roost needs a landing page and iOS/Mac apps.
+## Live now 2026-10-04
+- [x] Renamed from Roost to Brick (GitHub nulljosh/brick, brick.heyitsmejosh.com).
+- [x] Landing page deployed with 27-second promo video, feature cards, honest copy.
+- [x] iPhone app built, signed, Liquid Glass sheet map, deal scoring by percent under median.
+- [x] Desktop app (tui/) and Android built in CI, tests green.
+- [x] Live listings from HousingFeed and RentCast via /api/listings, 24h KV cache.
+- [x] AI mode turns plain words to filters (Workers AI llama-3.3-70b with rules fallback).
 
 ## Worldwide build 2026-08-28
 Web app now browses anywhere on earth: Nominatim place search, real local street
 names from Overpass, per-country currency/units/price levels, sale and rent
 modes, and UI strings in 25 languages with RTL.
 
-- [ ] Native iOS + macOS apps. Not started. One SwiftUI multiplatform target with
-      MapKit, reusing the same market tables and generator ported to Swift.
-- [ ] Login/Register/ForgotPassword copy is still English-only; the strings dict
-      has the keys, the pages just do not call `t()` yet.
-- [ ] Listing descriptions and feature bullets were removed: the old generated
-      English prose could not be localized. Either translate a template or wait
-      for a real feed.
-- [ ] Inventory is generated, not real. Shape matches an MLS/IDX response so a
-      feed swap is one function (`generateListings`).
-- [ ] Rename check before any App Store record, run asc-name-creator.
+- [ ] Hero line translatable into all 26 languages (currently English-only on landing).
+- [ ] Login/Register/ForgotPassword copy localization (strings dict has keys, pages need `t()` calls).
 - [x] Landing pitch translated into all 26 languages (2026-09-06).
+- [x] Live listings replace generated inventory (2026-10-04).
 
-## Demo pass 2026-08-30
+## Polish and optimization
 
-Signing in worked for the first time, so the app behind /browse got a real look.
-Fixed: Overpass mirrors + a 30 day localStorage cache, Esri dark tiles (CARTO
-watermarks unkeyed domains), pin thinning by zoom, favorites synced to the
-account, Settings preferences actually applied to browse filters and priced off
-the local market, protected routes waiting for the session instead of bouncing
-signed-in people to /login, the filter row wrapping instead of looking clipped,
-and the detail page's mislabelled area/year stats.
-
-- [x] Price pins now use Web Mercator pixel collision checks at each zoom, so
-      dense pockets show separated pills without adding a cluster library.
 - [ ] No land check on generated coordinates. Street anchors are on land by
       construction, but the no-streets fallback can still put a home in water.
 - [ ] Service worker serves the previous build for one load after a deploy.
       Every check of a fresh deploy needs a hard reload or an unregister first.
-- [ ] `animate.css` is imported in `src/main.jsx` and never used: roughly 70K of
-      the 108K CSS bundle.
-- [ ] JS ships as one 592K chunk; Leaflet loads on the landing page where there
-      is no map. Wants a route-level split.
-- [ ] Login/Register/ForgotPassword copy is still English-only.
+- [ ] JS bundle split: Leaflet loads on landing where no map exists. Route-level code splitting wanted.
 - [ ] `npm test` runs two node files. No CI runs them.
-- [ ] 12 photos across 60 listings, so each image is the hero of 5 homes.
 
 ## TUI pilot (2026-09-05)
 - `roost-tui` SwiftPM target (SwiftTUI). `swift build && ./.build/debug/roost-tui "Vancouver"` hits Nominatim directly, same public geocoding API src/lib/geo.js calls. Needs a real TTY.
