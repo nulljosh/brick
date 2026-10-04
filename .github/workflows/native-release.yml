@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
-      - uses: android-actions/setup-android@v3
+      # The runner image ships the Android SDK; setup-android@v3 broke on its sdkmanager.
       # ponytail: debug APK, sideloadable today. assembleRelease once a keystore is in secrets.
       - run: ./gradlew :composeApp:assembleDebug --no-daemon
         working-directory: kmp
