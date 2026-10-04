@@ -37,3 +37,12 @@
     --blue-light: #E0BFA9;
   }
 }
+
+/* Light mode is plain white, not the shared cream. Dark mode keeps the shared tokens. */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-bg: #FFFFFF;
+    --color-bg2: #F4F4F3;
+    --surface-2: #F4F4F3;
+  }
+}

@@ -4,7 +4,7 @@ v3.0.0, worldwide real estate browsing. Repo: https://github.com/nulljosh/brick
 ## Rules
 
 - Mobile-first layout, horizontal filter chips on small screens
-- Palette and type come from `src/tokens.css` (cream `#FFF3E8` (the icon background), bark `#3A2A20`,
+- Palette and type come from `src/tokens.css` (white `#FFFFFF` background (cream retired 2026-10-04), bark `#3A2A20`,
   clay `#B5836A`, tan `#C9A184`, the icon palette). Edit that file; do not add a second theme.
   The harsh red `#E4002B` was softened to clay tones on 2026-08-31.
 - Sans-serif only, DM Sans via `var(--font)` / `var(--font-display)`. No serif
