@@ -46,6 +46,8 @@ struct Place: Codable, Hashable, Identifiable, Sendable {
     let lat: Double
     let lng: Double
     let countryCode: String
+    // The town a neighbourhood belongs to; the listing feeds index by town.
+    var area: String? = nil
 
     static let start = Place(name: "Vancouver", detail: "British Columbia, Canada", lat: 49.2827, lng: -123.1207, countryCode: "CA")
 }
@@ -62,7 +64,7 @@ private struct Feed: Decodable {
 }
 
 private struct NominatimHit: Decodable {
-    struct Address: Decodable { let country_code: String?; let state: String?; let country: String? }
+    struct Address: Decodable { let country_code: String?; let state: String?; let country: String?; let city: String?; let town: String?; let municipality: String?; let village: String? }
     let name: String?
     let display_name: String
     let lat: String
@@ -98,7 +100,7 @@ final class Store {
         var c = URLComponents(string: Self.api)!
         c.queryItems = [
             .init(name: "lat", value: String(place.lat)), .init(name: "lng", value: String(place.lng)),
-            .init(name: "country", value: place.countryCode), .init(name: "city", value: place.name),
+            .init(name: "country", value: place.countryCode), .init(name: "city", value: place.name), .init(name: "area", value: place.area ?? ""),
             .init(name: "mode", value: mode)
         ]
         loading = true
@@ -122,7 +124,7 @@ final class Store {
         c.queryItems = [
             .init(name: "q", value: query), .init(name: "format", value: "jsonv2"),
             .init(name: "addressdetails", value: "1"), .init(name: "limit", value: "8"),
-            .init(name: "featureType", value: "city")
+            .init(name: "featureType", value: "settlement")
         ]
         var req = URLRequest(url: c.url!)
         // Nominatim's usage policy asks every client to identify itself.
@@ -133,7 +135,9 @@ final class Store {
             guard let lat = Double(h.lat), let lng = Double(h.lon) else { return nil }
             let name = h.name ?? h.display_name.components(separatedBy: ",").first ?? h.display_name
             let detail = [h.address?.state, h.address?.country].compactMap { $0 }.joined(separator: ", ")
-            return Place(name: name, detail: detail, lat: lat, lng: lng, countryCode: (h.address?.country_code ?? "").uppercased())
+            let a = h.address
+            return Place(name: name, detail: detail, lat: lat, lng: lng, countryCode: (a?.country_code ?? "").uppercased(),
+                         area: a?.city ?? a?.town ?? a?.municipality ?? a?.village)
         }
     }
 

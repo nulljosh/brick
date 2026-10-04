@@ -53,6 +53,9 @@ function toPlace(r) {
     name: r.name || r.display_name.split(',')[0],
     label: r.display_name,
     countryCode: (r.address?.country_code || '').toUpperCase(),
+    // The town a neighbourhood belongs to. Listing feeds index by town, so
+    // Brookswood has to be asked for as Langley.
+    area: r.address?.city || r.address?.town || r.address?.municipality || r.address?.village || '',
     lat: Number(r.lat),
     lng: Number(r.lon),
     // Nominatim gives [south, north, west, east]; everything else here wants

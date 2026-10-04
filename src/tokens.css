@@ -1,5 +1,5 @@
 @import url("https://heyitsmejosh.com/tokens.css");
-:root{--clay:#B5836A;--cream:var(--color-bg2);--yellow:#B5836A;--charcoal:var(--color-text);--accent2:#96654E;--font-display:var(--font-body);--font:var(--font-body);--cell0:var(--bg2);--cell1:#EFD6C2;--cell2:#DDB89E;--cell3:#C9A184;--cell4:#B5836A;}
+:root{--clay:#B5836A;--cream:var(--color-bg2);--charcoal:var(--color-text);--accent2:#96654E;--font-display:var(--font-body);--font:var(--font-body);--cell0:var(--bg2);--cell1:#EFD6C2;--cell2:#DDB89E;--cell3:#C9A184;--cell4:#B5836A;}
 
 /* Brick keeps its warm brown accent on the shared portfolio geometry and type. */
 :root {
@@ -10,26 +10,25 @@
   --muted: var(--text2);
 
   --navy: #1A1A1A;
-  --navy-light: #2a2118;
-  --navy-lighter: #332920;
+  --navy-light: #222222;
+  --navy-lighter: #2C2C2C;
   --blue-dark: #96654E;
   --blue: #B5836A;
   --blue-light: #D2A88E;
-  --amber: #E3B778;
   --green: #1a7f37;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --surface: #29211B;
-    --surface-2: #352A22;
-    --border2: rgba(255,248,240,0.06);
+    --surface: #1E1E1E;
+    --surface-2: #262626;
+    --border2: rgba(255,255,255,0.06);
     --text-dim: var(--text2);
 
     --navy: #1A1A1A;
-    --navy-light: #2a2118;
-    --navy-lighter: #332920;
-    --cream: #FFF8F0;
+    --navy-light: #222222;
+    --navy-lighter: #2C2C2C;
+    --cream: #F2F2F2;
     --cream-dim: var(--text2);
     --muted: var(--text2);
     --blue-dark: #D2A88E;
@@ -38,11 +37,27 @@
   }
 }
 
-/* Light mode is plain white, not the shared cream. Dark mode keeps the shared tokens. */
-@media (prefers-color-scheme: light) {
-  :root {
-    --color-bg: #FFFFFF;
-    --color-bg2: #F4F4F3;
-    --surface-2: #F4F4F3;
+/* Neutral greys under the clay accent. The shared portfolio tokens lean
+   cream and yellow (hairlines #dcd2bd, warm text), which Brick drops. */
+:root {
+  --color-bg: #FFFFFF;
+  --color-bg2: #F4F4F4;
+  --surface-2: #F4F4F4;
+  --color-hairline: #E4E4E4;
+  --color-text: #161616;
+  --color-secondary: rgba(0, 0, 0, 0.58);
+  --text3: rgba(0, 0, 0, 0.34);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-bg: #121212;
+    --color-bg2: #1C1C1C;
+    --color-hairline: #2E2E2E;
+    --color-text: #F2F2F2;
+    --color-secondary: rgba(255, 255, 255, 0.6);
+    --text3: rgba(255, 255, 255, 0.34);
+    --surface: #1E1E1E;
+    --surface-2: #262626;
   }
 }

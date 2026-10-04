@@ -3,6 +3,8 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  // `npm run dev` talks to the live functions, so local QA sees real listings.
+  server: { proxy: { '/api': { target: 'https://brick.heyitsmejosh.com', changeOrigin: true } } },
   plugins: [
     react(),
     VitePWA({

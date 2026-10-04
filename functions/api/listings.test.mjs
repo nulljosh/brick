@@ -23,4 +23,23 @@ const none = await (await call('lat=52.5&lng=13.4&country=DE&city=Berlin&mode=sa
 assert.deepEqual(none.listings, [], 'no provider covers DE without keys for it')
 
 assert.equal((await call('lat=x&lng=1')).status, 400)
+// A neighbourhood the feed does not index falls back to its town, nearest first.
+const asked = []
+globalThis.fetch = async (url, init) => {
+  const { city } = JSON.parse(init.body)
+  asked.push(city)
+  if (city !== 'Langley') return Response.json([])
+  return Response.json([
+    { id: 'far', lat: 49.3, lng: -123.1, rent_min: 2000, city: 'Langley' },
+    ...[1, 2, 3, 4, 5].map(i => ({ id: `n${i}`, lat: 49.08 + i / 1000, lng: -122.64, rent_min: 1500 + i, city: 'Langley' }))
+  ])
+}
+const near = await (await onRequestGet({
+  request: new Request('https://x.test/api/listings?lat=49.08&lng=-122.64&country=CA&city=Brookswood&area=Township%20of%20Langley&mode=rent'),
+  env: { APIFY_TOKEN: 't' }
+})).json()
+assert.deepEqual(asked, ['Brookswood', 'Langley'])
+assert.equal(near.listings[0].id, 'hf-n1', 'nearest first')
+assert.ok(!near.listings.some(l => l.id === 'hf-far'), 'homes 30+ km away are dropped')
+
 console.log('listings api: ok')

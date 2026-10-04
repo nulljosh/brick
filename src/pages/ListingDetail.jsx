@@ -1,7 +1,8 @@
+import { NoPhoto } from '../components/ListingCard'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useState } from 'react'
 import { usePlace } from '../context/PlaceContext'
-import { listingFormatters } from '../lib/format'
+import { listingFormatters, thumb } from '../lib/format'
 import { useI18n } from '../i18n'
 import { useFavorites } from '../context/FavoritesContext'
 import './ListingDetail.css'
@@ -32,7 +33,7 @@ export default function ListingDetail() {
       <div className="detail-layout fade-up">
         <div className="detail-gallery">
           <div className="detail-main-photo">
-            {listing.photos[photoIdx] && <img src={listing.photos[photoIdx]} alt={listing.address} />}
+            {listing.photos[photoIdx] ? <img src={thumb(listing.photos[photoIdx], 1200)} alt={listing.address} /> : <NoPhoto />}
             <button className="detail-back" onClick={() => navigate(-1)}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -55,7 +56,7 @@ export default function ListingDetail() {
                 className={`detail-thumb ${i === photoIdx ? 'active' : ''}`}
                 onClick={() => setPhotoIdx(i)}
               >
-                <img src={photo} alt="" />
+                <img src={thumb(photo, 200)} alt="" loading="lazy" />
               </button>
             ))}
           </div>
@@ -75,10 +76,12 @@ export default function ListingDetail() {
               <span className="detail-stat-value">{listing.baths}</span>
               <span className="detail-stat-label">{t('ba')}</span>
             </div>
-            <div className="detail-stat">
-              <span className="detail-stat-value">{fmt.area}</span>
-              <span className="detail-stat-label">{t('area')}</span>
-            </div>
+            {fmt.area && (
+              <div className="detail-stat">
+                <span className="detail-stat-value">{fmt.area}</span>
+                <span className="detail-stat-label">{t('area')}</span>
+              </div>
+            )}
             {listing.year && (
               <div className="detail-stat">
                 <span className="detail-stat-value">{listing.year}</span>

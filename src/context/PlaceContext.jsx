@@ -41,7 +41,7 @@ export function PlaceProvider({ children }) {
   useEffect(() => {
     const controller = new AbortController()
     setLive([])
-    const q = new URLSearchParams({ lat: place.lat, lng: place.lng, country: place.countryCode || '', city: place.name, mode })
+    const q = new URLSearchParams({ lat: place.lat, lng: place.lng, country: place.countryCode || '', city: place.name, area: place.area || '', mode })
     fetch(`/api/listings?${q}`, { signal: controller.signal })
       .then(r => (r.ok ? r.json() : { listings: [] }))
       .then(d => setLive(d.listings || []))

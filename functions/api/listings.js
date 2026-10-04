@@ -9,7 +9,11 @@ import { marketFor } from '../../src/lib/market.js'
 const TTL = 6 * 3600
 const SQM = 10.7639
 
-const typeOf = s => (/condo|apart|flat|studio|unit/i.test(s) ? 'condo' : /town|terrace|row/i.test(s) ? 'townhouse' : 'house')
+// Feeds rarely say what kind of home it is, but a unit number in front of the
+// street number ("319 20769 Fraser Hwy") or a suite word means an apartment.
+const unitLike = /\b(suite|bsmt|basement|unit|apt|apartment|#)|^\s*[a-z]?\d+[a-z]?\s+\d{3,}/i
+const typeOf = (s, address = '') => (unitLike.test(address) && !/town|row/i.test(s) ? 'condo' : typeOfRaw(s))
+const typeOfRaw = s => (/condo|apart|flat|studio|unit/i.test(s) ? 'condo' : /town|terrace|row/i.test(s) ? 'townhouse' : 'house')
 const num = n => (Number.isFinite(+n) ? +n : 0)
 const days = d => (d ? Math.max(0, Math.round((Date.now() - Date.parse(d)) / 864e5)) : 30)
 
@@ -67,7 +71,7 @@ async function housingfeed(env, p) {
       currency: r.currency || undefined,
       price: r.rent_min || r.rent_max,
       beds: num(r.beds), baths: num(r.baths), sqft: num(r.sqft_min || r.sqft_max),
-      type: typeOf(r.property_type),
+      type: typeOf(r.property_type || '', r.street || r.address),
       lat: r.lat, lng: r.lng,
       photo: photos[0] || null, photos,
       listedDaysAgo: days(r.first_seen_at)
@@ -75,7 +79,34 @@ async function housingfeed(env, p) {
   })
 }
 
-const PROVIDERS = [rentcast, housingfeed]
+// "Township of Langley" -> "Langley".
+const townName = s => s.replace(/^(township|city|district|town|municipality|village) of /i, '').replace(/ (township|city|district)$/i, '').trim()
+
+function km(a, b) {
+  const r = Math.PI / 180
+  const x = (b.lng - a.lng) * r * Math.cos(((a.lat + b.lat) / 2) * r)
+  const y = (b.lat - a.lat) * r
+  return Math.hypot(x, y) * 6371
+}
+
+// The feed indexes by town, so a neighbourhood search (Brookswood) comes back
+// empty. Ask for the neighbourhood, then its town, keep what is within reach,
+// nearest first.
+async function housingfeedNear(env, p) {
+  const names = [...new Set([p.city, townName(p.area)].filter(Boolean))]
+  let rows = []
+  for (const city of names) {
+    rows = await housingfeed(env, { ...p, city })
+    if (rows.length >= 5) break
+  }
+  return rows
+    .map(l => ({ l, d: km(p, l) }))
+    .filter(x => x.d <= 40)
+    .sort((a, b) => a.d - b.d)
+    .map(x => x.l)
+}
+
+const PROVIDERS = [rentcast, housingfeedNear]
 
 export async function onRequestGet({ request, env }) {
   const q = new URL(request.url).searchParams
@@ -83,12 +114,13 @@ export async function onRequestGet({ request, env }) {
     lat: +q.get('lat'), lng: +q.get('lng'),
     country: (q.get('country') || '').toUpperCase(),
     city: q.get('city') || '',
+    area: q.get('area') || '',
     mode: q.get('mode') === 'rent' ? 'rent' : 'sale',
     radius: Math.min(+q.get('radius') || 15, 50)
   }
   if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return Response.json({ error: 'lat and lng required' }, { status: 400 })
 
-  const key = new Request(`${new URL(request.url).origin}/_c/${p.country}/${p.city}/${p.lat.toFixed(1)}/${p.lng.toFixed(1)}/${p.mode}`)
+  const key = new Request(`${new URL(request.url).origin}/_c2/${p.country}/${p.city}/${p.area}/${p.lat.toFixed(1)}/${p.lng.toFixed(1)}/${p.mode}`)
   const hit = await caches.default.match(key)
   if (hit) return hit
 
@@ -106,7 +138,13 @@ export async function onRequestGet({ request, env }) {
 
   // Lets the native app hide Buy until a sale feed is switched on.
   const modes = env.RENTCAST_KEY ? ['rent', 'sale'] : ['rent']
-  const res = Response.json({ listings: out, sources, modes }, { headers: { 'cache-control': `public, max-age=${out.length ? TTL : 300}` } })
+  // One unit re-posted by several sources shows up once.
+  const seen = new Set()
+  const unique = out.filter(l => {
+    const k = [l.address, l.price, l.beds, l.sqft].join('|').toLowerCase()
+    return !seen.has(k) && seen.add(k)
+  })
+  const res = Response.json({ listings: unique, sources, modes }, { headers: { 'cache-control': `public, max-age=${unique.length ? TTL : 300}` } })
   await caches.default.put(key, res.clone())
   return res
 }

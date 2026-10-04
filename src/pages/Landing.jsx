@@ -4,6 +4,7 @@ import { useI18n, supportedLanguages, languageLabel } from '../i18n'
 import { rtlLanguages } from '../i18n/strings'
 import { coverage } from '../lib/market'
 import { photos } from '../data/listings'
+import { thumb } from '../lib/format'
 import './Landing.css'
 
 const prefersReducedMotion = () =>
@@ -87,9 +88,9 @@ export default function Landing() {
           </div>
         </div>
         <div className="hero-preview" aria-label={t('sample_listings')}>
-          <img src={live?.[0].photo || photos[0]} alt="" fetchPriority="high" />
-          <img src={live?.[1].photo || photos[1]} alt="" />
-          <img src={live?.[2].photo || photos[2]} alt="" />
+          <img src={live ? thumb(live[0].photo, 900) : photos[0]} alt="" fetchPriority="high" />
+          <img src={live ? thumb(live[1].photo, 480) : photos[1]} alt="" />
+          <img src={live ? thumb(live[2].photo, 480) : photos[2]} alt="" />
           <span>{live ? t('live_listings') : t('sample_listings')}</span>
         </div>
       </section>

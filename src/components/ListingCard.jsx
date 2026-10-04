@@ -1,8 +1,21 @@
 import { Link } from 'react-router-dom'
 import { useFavorites } from '../context/FavoritesContext'
-import { listingFormatters } from '../lib/format'
+import { listingFormatters, thumb } from '../lib/format'
 import { useI18n } from '../i18n'
 import './ListingCard.css'
+
+// Many real listings come without photos. A quiet brick mark beats a white hole.
+export function NoPhoto() {
+  return (
+    <div className="no-photo" aria-hidden="true">
+      <svg width="56" height="32" viewBox="144 312 736 416">
+        <rect x="344" y="328" width="336" height="176" rx="28" />
+        <rect x="160" y="536" width="336" height="176" rx="28" />
+        <rect x="528" y="536" width="336" height="176" rx="28" />
+      </svg>
+    </div>
+  )
+}
 
 export default function ListingCard({ listing, index = 0 }) {
   const { toggle, isFavorite } = useFavorites()
@@ -17,7 +30,15 @@ export default function ListingCard({ listing, index = 0 }) {
       style={{ animationDelay: `${(index % 12) * 0.04}s` }}
     >
       <div className="listing-card-img">
-        {listing.photo && <img src={listing.photo} alt={listing.address} loading="lazy" />}
+        {listing.photo
+          ? <img
+              src={thumb(listing.photo, 640)}
+              alt={listing.address}
+              loading={index < 4 ? 'eager' : 'lazy'}
+              decoding="async"
+              onLoad={e => e.currentTarget.classList.add('loaded')}
+            />
+          : <NoPhoto />}
         <button
           className={`fav-btn ${fav ? 'active' : ''}`}
           onClick={e => { e.preventDefault(); toggle(listing.id) }}
@@ -39,8 +60,7 @@ export default function ListingCard({ listing, index = 0 }) {
           <span>{listing.beds} {t('bd')}</span>
           <span className="meta-dot" />
           <span>{listing.baths} {t('ba')}</span>
-          <span className="meta-dot" />
-          <span>{fmt.area}</span>
+          {fmt.area && <><span className="meta-dot" /><span>{fmt.area}</span></>}
         </div>
         <div className="listing-address">{listing.address}</div>
         <div className="listing-neighborhood">{listing.neighborhood}</div>

@@ -116,3 +116,20 @@
   font-size: 0.8125rem;
   color: var(--muted);
 }
+
+.no-photo {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--bg2);
+}
+
+.no-photo svg { fill: var(--text3); }
+
+/* Shimmer until the photo lands, then fade it in. */
+.listing-card-img { background: linear-gradient(100deg, var(--bg2) 40%, var(--surface) 50%, var(--bg2) 60%) 0 0 / 300% 100%; animation: shimmer 1.4s linear infinite; }
+.listing-card-img img { opacity: 0; transition: opacity 0.35s ease, transform 0.3s ease; }
+.listing-card-img img.loaded { opacity: 1; }
+@keyframes shimmer { to { background-position: -150% 0; } }
+@media (prefers-reduced-motion: reduce) { .listing-card-img { animation: none; } .listing-card-img img { transition: none; } }

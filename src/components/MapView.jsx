@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
-import { listingFormatters } from '../lib/format'
+import { listingFormatters, thumb } from '../lib/format'
 import { visibleForZoom } from '../lib/mapPins'
 import { useI18n } from '../i18n'
 import './MapView.css'
@@ -22,27 +22,41 @@ function createPriceIcon(label, isFav) {
 function MapMarkers({ listings, favorites }) {
   const navigate = useNavigate()
   const { language, t } = useI18n()
-  const [zoom, setZoom] = useState(() => 12)
-  const map = useMapEvents({ zoomend: () => setZoom(map.getZoom()) })
+  const map = useMap()
+  const [zoom, setZoom] = useState(() => map.getZoom())
+  useMapEvents({ zoomend: () => setZoom(map.getZoom()) })
 
-  return visibleForZoom(listings, zoom,
-    listing => listingFormatters(listing, language, t).priceCompact).map(listing => {
+  // Real feeds geocode a whole building to one point, so ten units stack into
+  // one pin. Group them: the pin shows the count and the cheapest price.
+  const groups = new Map()
+  for (const l of listings) {
+    const key = `${l.lat.toFixed(4)},${l.lng.toFixed(4)}`
+    const g = groups.get(key)
+    if (!g) groups.set(key, { ...l, count: 1 })
+    else { g.count++; if (l.price < g.price) Object.assign(g, l, { count: g.count }) }
+  }
+  const label = g => {
+    const p = listingFormatters(g, language, t).priceCompact
+    return g.count > 1 ? `${g.count} · ${p}` : p
+  }
+
+  return visibleForZoom([...groups.values()], zoom, label).map(listing => {
     const fmt = listingFormatters(listing, language, t)
     return (
       <Marker
         key={listing.id}
         position={[listing.lat, listing.lng]}
-        icon={createPriceIcon(fmt.priceCompact, favorites.includes(listing.id))}
+        icon={createPriceIcon(label(listing), favorites.includes(listing.id))}
         zIndexOffset={Math.round((90 - listing.lat) * 100)}
         riseOnHover
         eventHandlers={{ click: () => navigate(`/listing/${listing.id}`) }}
       >
         <Popup className="roost-popup">
           <div className="popup-content">
-            {listing.photo && <img src={listing.photo} alt="" />}
+            {listing.photo && <img src={thumb(listing.photo, 320)} alt="" />}
             <div className="popup-info">
               <strong>{fmt.price}</strong>
-              <span>{listing.beds} {t('bd')} / {listing.baths} {t('ba')} / {fmt.area}</span>
+              <span>{[`${listing.beds} ${t('bd')}`, `${listing.baths} ${t('ba')}`, fmt.area].filter(Boolean).join(' / ')}</span>
               <span className="popup-address">{listing.address}</span>
             </div>
           </div>
@@ -53,11 +67,14 @@ function MapMarkers({ listings, favorites }) {
 }
 
 // Browsing to a new city has to move the map; Leaflet keeps its own view state.
-function RecenterOn({ place }) {
+// Once homes arrive, frame them rather than the place's centre point.
+function RecenterOn({ place, listings }) {
   const map = useMap()
+  const first = listings[0]?.id
   useEffect(() => {
-    map.setView([place.lat, place.lng], 12)
-  }, [place.id, place.lat, place.lng, map])
+    if (!listings.length) return map.setView([place.lat, place.lng], 12)
+    map.fitBounds(listings.map(l => [l.lat, l.lng]), { padding: [40, 40], maxZoom: 14 })
+  }, [place.id, first, map])
   return null
 }
 
@@ -86,7 +103,7 @@ export default function MapView({ listings, favorites, place }) {
           attribution='&copy; Esri'
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
         />}
-        <RecenterOn place={place} />
+        <RecenterOn place={place} listings={listings} />
         <MapMarkers listings={listings} favorites={favorites} />
       </MapContainer>
     </div>
