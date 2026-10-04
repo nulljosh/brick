@@ -1,6 +1,6 @@
-# Roost API
+# Hemma API
 
-Roost has no HTTP API of its own. Listings are bundled with the client and
+Hemma has no HTTP API of its own. Listings are bundled with the client and
 favourites live in `localStorage`; user accounts go straight to Supabase from
 the browser (`src/lib/supabase.js`). The agent-facing interface is WebMCP.
 

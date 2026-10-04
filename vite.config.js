@@ -8,8 +8,8 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Roost',
-        short_name: 'Roost',
+        name: 'Hemma',
+        short_name: 'Hemma',
         description: 'Homes for sale and for rent, anywhere on earth',
         theme_color: '#1A1A1A',
         background_color: '#1A1A1A',

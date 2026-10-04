@@ -4,7 +4,7 @@
 // count outgrows one screen.
 
 export const en = {
-  brand: 'Roost',
+  brand: 'Hemma',
   listings: 'Listings',
   settings: 'Settings',
   search_placeholder: 'Search any city, region or country',
@@ -76,7 +76,7 @@ export const en = {
 
   honest_label: 'Worth knowing',
   honest_title: 'The inventory is generated',
-  honest_body: 'Roost has no listing feed yet. Homes are generated per place from real market tables, in the shape an MLS or IDX response would arrive in, so swapping in a live feed is one function. Everything else here is real.',
+  honest_body: 'Hemma has no listing feed yet. Homes are generated per place from real market tables, in the shape an MLS or IDX response would arrive in, so swapping in a live feed is one function. Everything else here is real.',
 
   cta_title: 'Start anywhere',
   cta_body: 'Pick a city and see what a home there costs.'
