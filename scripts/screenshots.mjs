@@ -4,7 +4,7 @@
 // Playwright is borrowed from a sibling repo; set EMAIL/PASSWORD for the signed-in shots.
 import { createRequire } from 'node:module'
 import { spawn } from 'node:child_process'
-const { chromium } = createRequire('/Users/joshua/Documents/Code/sparkjar/package.json')('playwright')
+const { chromium } = createRequire('/Users/joshua/Documents/Code/vancouvervice/package.json')('playwright')
 
 const preview = spawn('npx', ['vite', 'preview', '--port', '4173', '--strictPort'], { stdio: 'ignore' })
 await new Promise(r => setTimeout(r, 1500))

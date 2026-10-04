@@ -31,6 +31,7 @@ export const en = {
   area: 'Area',
   year_built: 'Year built',
   approx_locations: 'Map data is unavailable right now, so these homes are placed approximately.',
+  live_listings: 'Real rentals in Vancouver, live from the feed.',
   sample_listings: 'Sample listings generated for exploration. These are not homes for sale or rent.',
   no_results: 'No listings found',
   adjust_filters: 'Try adjusting your filters or search another place',
@@ -76,7 +77,7 @@ export const en = {
 
   honest_label: 'Worth knowing',
   honest_title: 'Real where a feed exists',
-  honest_body: 'Rentals in 30 countries are real listings, pulled live. Where no feed covers a place yet, Brick shows sample homes built from real market tables, and labels them as samples.',
+  honest_body: 'Rentals in the United States, Canada, the United Kingdom and more are real listings, pulled live. Where no feed covers a place yet, Brick shows sample homes built from real market tables, and labels them as samples.',
 
   cta_title: 'Start anywhere',
   cta_body: 'Pick a city and see what a home there costs.'

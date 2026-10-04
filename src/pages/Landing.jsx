@@ -56,11 +56,24 @@ export default function Landing() {
     ['feat_rent_title', 'feat_rent_body']
   ]
 
+  // Three real rentals for the hero, from the same feed the app uses.
+  const [live, setLive] = useState(null)
+  useEffect(() => {
+    fetch('/api/listings?lat=49.2827&lng=-123.1207&country=CA&city=Vancouver&mode=rent')
+      .then(r => r.json())
+      .then(d => {
+        const withPhotos = (d.listings || []).filter(l => l.photo).slice(0, 3)
+        if (withPhotos.length === 3) setLive(withPhotos)
+      })
+      .catch(() => {})
+  }, [])
+
   return (
     <main className="landing">
+      {/* hero shows three real homes when the feed answers, sample photos until then */}
       <section className="landing-hero">
         <div className="landing-inner">
-          <svg className="hero-icon" width="72" height="72" viewBox="0 0 1024 1024" aria-hidden="true">
+          <svg className="hero-icon" width="96" height="56" viewBox="144 312 736 416" aria-hidden="true">
             <rect x="344" y="328" width="336" height="176" rx="28" fill="#B5836A" />
             <rect x="160" y="536" width="336" height="176" rx="28" fill="#C9A184" />
             <rect x="528" y="536" width="336" height="176" rx="28" fill="#B5836A" />
@@ -74,10 +87,10 @@ export default function Landing() {
           </div>
         </div>
         <div className="hero-preview" aria-label={t('sample_listings')}>
-          <img src={photos[0]} alt="" fetchPriority="high" />
-          <img src={photos[1]} alt="" />
-          <img src={photos[2]} alt="" />
-          <span>{t('sample_listings')}</span>
+          <img src={live?.[0].photo || photos[0]} alt="" fetchPriority="high" />
+          <img src={live?.[1].photo || photos[1]} alt="" />
+          <img src={live?.[2].photo || photos[2]} alt="" />
+          <span>{live ? t('live_listings') : t('sample_listings')}</span>
         </div>
       </section>
 
@@ -129,6 +142,11 @@ export default function Landing() {
         <p>{t('cta_body')}</p>
         <Link to="/browse" className="btn btn-primary">{t('listings')}</Link>
       </section>
+
+      <footer className="landing-footer">
+        <a href="/privacy">Privacy</a>
+        <a href="https://github.com/nulljosh/brick">GitHub</a>
+      </footer>
     </main>
   )
 }

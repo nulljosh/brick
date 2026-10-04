@@ -230,3 +230,13 @@
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }
 }
+
+.landing-footer {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0 1rem 3rem;
+  font-size: 0.875rem;
+}
+
+.landing-footer a { color: var(--text2); }
