@@ -25,13 +25,15 @@ export default function Listings() {
   )
 
   return (
-    <div className="page">
+    <div className="page browse">
+      {/* The map is the backdrop; everything else floats over it on glass. */}
+      <MapView listings={filtered} favorites={favorites} place={place} />
+      <div className="browse-panel">
       <AskBar resultCount={filtered.length} onAnswer={() => setAskCount(n => n + 1)} />
       <FilterBar resultCount={filtered.length} />
       {fetching && <p className="listings-notice listings-fetching" role="status">{t('fetching_listings', { place: place.name })}</p>}
       {!fetching && !isLive && <p className="listings-notice">{t('sample_listings')}</p>}
       {!isLive && streetsUnavailable && <p className="listings-notice">{t('approx_locations')}</p>}
-      <MapView listings={filtered} favorites={favorites} place={place} />
       <div className="listings-grid" key={askCount}>
         {filtered.map((listing, i) => (
           <ListingCard key={listing.id} listing={listing} index={i} />
@@ -43,6 +45,7 @@ export default function Listings() {
             <p>{t('adjust_filters')}</p>
           </div>
         )}
+      </div>
       </div>
     </div>
   )

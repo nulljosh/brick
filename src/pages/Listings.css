@@ -66,3 +66,81 @@
 
 @keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .listing-card.skeleton, .listings-fetching::before { animation: none; } }
+
+/* Liquid glass over a full-bleed map. The panel redefines --surface as a
+   translucent tint, so every card, chip and field inside it turns to glass
+   without each component knowing. */
+.page.browse { max-width: none; position: relative; }
+
+.page.browse .map-container {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  z-index: 0;
+}
+
+.browse-panel {
+  --surface: color-mix(in srgb, var(--color-bg) 52%, transparent);
+  --bg2: color-mix(in srgb, var(--color-bg) 42%, transparent);
+  --border: color-mix(in srgb, var(--color-text) 10%, transparent);
+  position: relative;
+  z-index: 1;
+  width: min(600px, 100%);
+  max-height: calc(100dvh - 68px - 2rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--color-bg) 30%, transparent);
+  backdrop-filter: blur(22px) saturate(1.8);
+  -webkit-backdrop-filter: blur(28px) saturate(1.7);
+  border: 1px solid color-mix(in srgb, #fff 55%, transparent);
+  box-shadow: 0 1px 0 color-mix(in srgb, #fff 70%, transparent) inset, 0 24px 70px -20px rgba(0, 0, 0, 0.35);
+  scrollbar-width: thin;
+  animation: fadeUp 0.5s ease both;
+}
+
+@media (prefers-color-scheme: dark) {
+  .browse-panel {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 24px 70px -20px rgba(0, 0, 0, 0.7);
+  }
+}
+
+.browse-panel .card,
+.browse-panel .chip,
+.browse-panel .ask-bar,
+.browse-panel .listings-notice {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.browse-panel .listings-grid { grid-template-columns: repeat(2, 1fr); gap: 0.9rem; }
+
+/* Phones: the map owns the top of the screen, the glass sheet rises from below. */
+@media (max-width: 700px) {
+  .browse-panel {
+    width: 100%;
+    max-height: none;
+    overflow: visible;
+    margin-top: 38dvh;
+    border-radius: 28px 28px 0 0;
+    padding: 1rem;
+  }
+  .browse-panel .listings-grid { grid-template-columns: 1fr; }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .browse-panel { background: var(--color-bg); }
+}
+
+/* The bar on top is glass too, so the map runs edge to edge under it. */
+.app:has(.page.browse) .nav {
+  background: color-mix(in srgb, var(--color-bg) 40%, transparent);
+  backdrop-filter: blur(22px) saturate(1.8);
+  -webkit-backdrop-filter: blur(22px) saturate(1.8);
+  border-bottom-color: color-mix(in srgb, var(--color-text) 8%, transparent);
+}

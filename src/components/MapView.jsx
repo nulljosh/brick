@@ -1,6 +1,6 @@
 import 'leaflet/dist/leaflet.css'
 import { useEffect, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, ZoomControl, useMap, useMapEvents } from 'react-leaflet'
 import { useNavigate } from 'react-router-dom'
 import L from 'leaflet'
 import { listingFormatters, thumb } from '../lib/format'
@@ -73,7 +73,15 @@ function RecenterOn({ place, listings }) {
   const first = listings[0]?.id
   useEffect(() => {
     if (!listings.length) map.setView([place.lat, place.lng], 12)
-    else map.fitBounds(listings.map(l => [l.lat, l.lng]), { padding: [40, 40], maxZoom: 14 })
+    // Keep the homes out from under the glass panel: left of it on desktop, above it on phones.
+    else {
+      const phone = window.innerWidth <= 700
+      map.fitBounds(listings.map(l => [l.lat, l.lng]), {
+        paddingTopLeft: phone ? [24, 130] : [Math.min(640, window.innerWidth / 2), 100],
+        paddingBottomRight: phone ? [24, window.innerHeight * 0.64] : [48, 48],
+        maxZoom: 14
+      })
+    }
   }, [place.id, first, map])
   return null
 }
@@ -93,6 +101,7 @@ export default function MapView({ listings, favorites, place }) {
         center={[place.lat, place.lng]}
         zoom={12}
         scrollWheelZoom={true}
+        zoomControl={false}
         style={{ width: '100%', height: '100%' }}
       >
         <TileLayer
@@ -103,6 +112,7 @@ export default function MapView({ listings, favorites, place }) {
           attribution='&copy; Esri'
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}"
         />}
+        <ZoomControl position="bottomright" />
         <RecenterOn place={place} listings={listings} />
         <MapMarkers listings={listings} favorites={favorites} />
       </MapContainer>
