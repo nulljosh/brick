@@ -4,7 +4,7 @@
 // count outgrows one screen.
 
 export const en = {
-  brand: 'Hemma',
+  brand: 'Brick',
   listings: 'Listings',
   settings: 'Settings',
   search_placeholder: 'Search any city, region or country',
@@ -75,8 +75,8 @@ export const en = {
   lang_body: 'The interface ships in {n} languages. Arabic, Hebrew, Persian and Urdu lay the whole page out right-to-left, not just the text.',
 
   honest_label: 'Worth knowing',
-  honest_title: 'The inventory is generated',
-  honest_body: 'Hemma has no listing feed yet. Homes are generated per place from real market tables, in the shape an MLS or IDX response would arrive in, so swapping in a live feed is one function. Everything else here is real.',
+  honest_title: 'Real where a feed exists',
+  honest_body: 'Rentals in 30 countries are real listings, pulled live. Where no feed covers a place yet, Brick shows sample homes built from real market tables, and labels them as samples.',
 
   cta_title: 'Start anywhere',
   cta_body: 'Pick a city and see what a home there costs.'

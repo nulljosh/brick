@@ -1,4 +1,4 @@
-# Hemma Roadmap (repo: roost)
+# Brick Roadmap
 
 ## App Store push 2026-09-03
 - [ ] Not yet in App Store Connect. Next steps: asc-name-creator probe (Roost

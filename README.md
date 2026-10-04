@@ -1,11 +1,11 @@
 <img src="public/icon.svg" width="80">
 
-# Hemma
+# Brick
 
 ![version](https://img.shields.io/badge/version-v3.0.0-blue)
-![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Froost-black?logo=github)](https://github.com/nulljosh/roost)
+![license](https://img.shields.io/badge/license-MIT-green) [![GitHub](https://img.shields.io/badge/GitHub-nulljosh%2Fbrick-black?logo=github)](https://github.com/nulljosh/brick)
 
-**Live:** https://roost.heyitsmejosh.com
+**Live:** https://brick.heyitsmejosh.com
 
 **Terminal:** `swift build && ./.build/debug/roost-tui "Vancouver"` — see [tui/](tui/)
 
@@ -49,7 +49,7 @@ feed is one function in `src/data/listings.js`.
 
 ## Source
 
-[github.com/nulljosh/roost](https://github.com/nulljosh/roost)
+[github.com/nulljosh/brick](https://github.com/nulljosh/brick)
 
 ## License
 

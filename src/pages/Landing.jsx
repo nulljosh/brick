@@ -61,16 +61,16 @@ export default function Landing() {
       <section className="landing-hero">
         <div className="landing-inner">
           <svg className="hero-icon" width="72" height="72" viewBox="0 0 1024 1024" aria-hidden="true">
-            <path d="M512 216 880 528v40H144v-40Z" fill="#B5836A" />
-            <rect x="248" y="528" width="528" height="288" rx="24" fill="#C9A184" />
-            <path d="M440 816V688a72 72 0 0 1 144 0v128Z" fill="var(--bg)" />
+            <rect x="344" y="328" width="336" height="176" rx="28" fill="#B5836A" />
+            <rect x="160" y="536" width="336" height="176" rx="28" fill="#C9A184" />
+            <rect x="528" y="536" width="336" height="176" rx="28" fill="#B5836A" />
           </svg>
           <h1>{t('brand')}</h1>
           <p>{t('landing_pitch')}</p>
           <div className="landing-buttons">
             <Link to="/browse" className="btn btn-primary">{t('listings')}</Link>
             <Link to="/login" className="btn btn-ghost">{t('sign_in')}</Link>
-            <a href="https://github.com/nulljosh/roost" className="btn btn-ghost">GitHub</a>
+            <a href="https://github.com/nulljosh/brick" className="btn btn-ghost">GitHub</a>
           </div>
         </div>
         <div className="hero-preview" aria-label={t('sample_listings')}>

@@ -14,8 +14,9 @@ export default function Nav() {
       <div className="nav-inner">
         <Link to="/" className="nav-logo">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path d="M3 21V9l9-7 9 7v12H15v-6h-2v6H3z" fill="currentColor" opacity="0.9"/>
-            <path d="M10 21v-4h4v4" stroke="var(--blue-light)" strokeWidth="1.5" fill="none"/>
+            <rect x="7" y="6" width="10" height="5.5" rx="1.2" fill="currentColor" opacity="0.9"/>
+            <rect x="1.5" y="12.5" width="10" height="5.5" rx="1.2" fill="currentColor" opacity="0.6"/>
+            <rect x="12.5" y="12.5" width="10" height="5.5" rx="1.2" fill="currentColor" opacity="0.9"/>
           </svg>
           <span>{t('brand')}</span>
         </Link>

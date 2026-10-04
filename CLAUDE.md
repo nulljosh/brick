@@ -1,5 +1,5 @@
-# roost (Hemma)
-v3.0.0, worldwide real estate browsing. Repo: https://github.com/nulljosh/roost
+# brick (ex-roost, ex-Hemma)
+v3.0.0, worldwide real estate browsing. Repo: https://github.com/nulljosh/brick
 
 ## Rules
 
@@ -30,7 +30,7 @@ them `authConfigured` is false and every sign-in shows "not configured".
 
 ## Deploy
 
-Cloudflare Pages project `roost` (roost.heyitsmejosh.com), direct upload:
+Cloudflare Pages project `roost` (brick.heyitsmejosh.com; roost.heyitsmejosh.com still resolves), direct upload:
 
 ```bash
 npm run build && npx wrangler pages deploy dist --project-name=roost --branch=main

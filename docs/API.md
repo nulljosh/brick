@@ -1,7 +1,9 @@
-# Hemma API
+# Brick API
 
-Hemma has no HTTP API of its own. Listings are bundled with the client and
-favourites live in `localStorage`; user accounts go straight to Supabase from
+Brick has one endpoint. `GET /api/listings?lat=&lng=&country=&city=&mode=sale|rent`
+returns `{ listings, sources }` from the live feeds (RentCast, HousingFeed),
+cached at the edge for six hours. It returns an empty list when no feed covers
+the place, and the client then shows labeled sample homes. Favourites live in `localStorage`; user accounts go straight to Supabase from
 the browser (`src/lib/supabase.js`). The agent-facing interface is WebMCP.
 
 ## WebMCP

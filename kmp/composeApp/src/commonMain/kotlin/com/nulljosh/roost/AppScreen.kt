@@ -47,7 +47,7 @@ fun AppScreen(geo: GeoClient = GeoClient()) {
 
     Surface {
         Column(Modifier.fillMaxSize().padding(24.dp)) {
-            Text("Hemma", style = MaterialTheme.typography.headlineMedium)
+            Text("Brick", style = MaterialTheme.typography.headlineMedium)
             Text("Browsing ${place.label}", modifier = Modifier.padding(top = 4.dp))
             Row(Modifier.padding(top = 16.dp)) {
                 OutlinedTextField(
