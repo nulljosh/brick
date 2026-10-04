@@ -6,7 +6,9 @@ import { marketFor } from '../../src/lib/market.js'
 // ponytail: two providers. Add one by adding an entry to PROVIDERS; idealista
 // (Spain/Italy/Portugal) is approval-gated, Repliers/SimplyRETS need a broker.
 
-const TTL = 6 * 3600
+// Rentals turn over in days, and every fresh lookup is billed per home (about
+// $2 per 1,000 on Apify's free plan), so a day of cache is the right trade.
+const TTL = 24 * 3600
 const SQM = 10.7639
 
 // Feeds rarely say what kind of home it is, but a unit number in front of the

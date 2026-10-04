@@ -51,10 +51,10 @@ export default function Landing() {
   ]
 
   const features = [
-    ['feat_search_title', 'feat_search_body'],
-    ['feat_streets_title', 'feat_streets_body'],
-    ['feat_money_title', 'feat_money_body'],
-    ['feat_rent_title', 'feat_rent_body']
+    ['feat2_search_title', 'feat2_search_body'],
+    ['feat2_ask_title', 'feat2_ask_body'],
+    ['feat2_deal_title', 'feat2_deal_body'],
+    ['feat2_save_title', 'feat2_save_body']
   ]
 
   // The demo plays only while it is on screen, and never for reduced motion.

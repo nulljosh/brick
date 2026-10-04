@@ -57,6 +57,6 @@ sample homes, labeled as samples.
 - functions/api/ask.js: AI mode. Plain words to filters via Workers AI (`[ai]` in wrangler.toml), rules parser fallback
 - src/lib/ask.js, src/lib/deals.js: the rules parser and the deal score (percent under the median for the same bedroom count)
 - src/components/AskBar.jsx: the ask bar on /browse. Local QA without signing in: `npm run dev`, then /browse?preview (dev builds only)
-- functions/api/listings.js: Live listings proxy (RentCast, HousingFeed), 6h edge cache
+- functions/api/listings.js: Live listings proxy (RentCast, HousingFeed), 24h KV cache
 - src/data/listings.js: Per-place seeded listing generation (MLS/IDX shape)
 - src/pages/: Landing, Login, Register, ForgotPassword, Listings, ListingDetail, Settings
