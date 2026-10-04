@@ -119,9 +119,17 @@ struct PricePill: View {
 
 struct Photo: View {
     let url: String?
+    var width = 640
+
+    // Feed photos are full-size originals; wsrv.nl serves a resized WebP, same as the web app.
+    private var resized: URL? {
+        guard let url, url.hasPrefix("http"),
+              let q = url.addingPercentEncoding(withAllowedCharacters: .alphanumerics) else { return nil }
+        return URL(string: "https://wsrv.nl/?url=\(q)&w=\(width)&h=\(width * 11 / 16)&fit=cover&output=webp&q=72")
+    }
 
     var body: some View {
-        AsyncImage(url: url.flatMap(URL.init)) { phase in
+        AsyncImage(url: resized) { phase in
             if let image = phase.image {
                 image.resizable().scaledToFill()
             } else {
@@ -136,7 +144,7 @@ struct ListingRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Photo(url: listing.photos.first)
+            Photo(url: listing.photos.first, width: 240)
                 .frame(width: 96, height: 72)
                 .clipShape(RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 3) {
@@ -158,7 +166,7 @@ struct ListingDetail: View {
             VStack(alignment: .leading, spacing: 16) {
                 TabView {
                     ForEach(listing.photos.isEmpty ? [""] : listing.photos, id: \.self) { p in
-                        Photo(url: p.isEmpty ? nil : p).frame(maxWidth: .infinity).clipped()
+                        Photo(url: p.isEmpty ? nil : p, width: 1200).frame(maxWidth: .infinity).clipped()
                     }
                 }
                 .tabViewStyle(.page)

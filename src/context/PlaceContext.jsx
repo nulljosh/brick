@@ -20,7 +20,9 @@ export function PlaceProvider({ children }) {
   const [streets, setStreets] = useState([])
   const [streetsUnavailable, setStreetsUnavailable] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [live, setLive] = useState([])
+  // null while the feed is still answering; a first look at a new town can take
+  // half a minute, and flashing sample homes in the meantime reads as a bug.
+  const [live, setLive] = useState(null)
 
   // Street names come from Overpass once per place; the listings themselves are
   // derived, so there is nothing else to fetch when the sale/rent mode flips.
@@ -40,19 +42,20 @@ export function PlaceProvider({ children }) {
   // or no key is set, and then the sample homes below stand in, labeled as such.
   useEffect(() => {
     const controller = new AbortController()
-    setLive([])
+    setLive(null)
     const q = new URLSearchParams({ lat: place.lat, lng: place.lng, country: place.countryCode || '', city: place.name, area: place.area || '', mode })
     fetch(`/api/listings?${q}`, { signal: controller.signal })
       .then(r => (r.ok ? r.json() : { listings: [] }))
       .then(d => setLive(d.listings || []))
-      .catch(() => {})
+      .catch(err => { if (err.name !== 'AbortError') setLive([]) })
     return () => controller.abort()
   }, [place.id, mode])
 
   // ponytail: a feed that returns a handful of homes for a whole city reads as
   // broken, so below this the labeled samples stand in. Tune if feeds get denser.
-  const isLive = live.length >= 5
-  const listings = isLive ? live : generateListings(place, streets, mode)
+  const fetching = live === null
+  const isLive = !fetching && live.length >= 5
+  const listings = fetching ? [] : isLive ? live : generateListings(place, streets, mode)
 
   function setPlace(next) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next))
@@ -65,7 +68,7 @@ export function PlaceProvider({ children }) {
   }
 
   return (
-    <PlaceContext.Provider value={{ place, setPlace, mode, setMode: changeMode, listings, isLive, loading, streetsUnavailable }}>
+    <PlaceContext.Provider value={{ place, setPlace, mode, setMode: changeMode, listings, isLive, fetching, loading, streetsUnavailable }}>
       {children}
     </PlaceContext.Provider>
   )

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { onRequestGet } from './listings.js'
 
 const store = new Map()
-globalThis.caches = { default: { match: async k => store.get(k.url), put: async (k, r) => store.set(k.url, r) } }
+const kv = { get: async k => store.get(k) ?? null, put: async (k, v) => store.set(k, v) }
 globalThis.fetch = async url => {
   assert.match(String(url), /api\.rentcast\.io\/v1\/listings\/sale/)
   return Response.json([
@@ -11,7 +11,7 @@ globalThis.fetch = async url => {
   ])
 }
 
-const call = qs => onRequestGet({ request: new Request(`https://x.test/api/listings?${qs}`), env: { RENTCAST_KEY: 'k' } })
+const call = qs => onRequestGet({ request: new Request(`https://x.test/api/listings?${qs}`), env: { RENTCAST_KEY: 'k', BRICK_CACHE: kv } })
 
 const ok = await (await call('lat=30.2&lng=-97.7&country=US&city=Austin&mode=sale')).json()
 assert.equal(ok.listings.length, 1, 'rows without coordinates are dropped')
@@ -23,6 +23,12 @@ const none = await (await call('lat=52.5&lng=13.4&country=DE&city=Berlin&mode=sa
 assert.deepEqual(none.listings, [], 'no provider covers DE without keys for it')
 
 assert.equal((await call('lat=x&lng=1')).status, 400)
+
+// A second ask for the same city is served from the cache, not the paid feed.
+let paid = 0
+globalThis.fetch = async () => { paid++; return Response.json([]) }
+await call('lat=30.2&lng=-97.7&country=US&city=Austin&mode=sale')
+assert.equal(paid, 0, 'cached city does not hit the feed again')
 // A neighbourhood the feed does not index falls back to its town, nearest first.
 const asked = []
 globalThis.fetch = async (url, init) => {
@@ -36,7 +42,7 @@ globalThis.fetch = async (url, init) => {
 }
 const near = await (await onRequestGet({
   request: new Request('https://x.test/api/listings?lat=49.08&lng=-122.64&country=CA&city=Brookswood&area=Township%20of%20Langley&mode=rent'),
-  env: { APIFY_TOKEN: 't' }
+  env: { APIFY_TOKEN: 't', BRICK_CACHE: kv }
 })).json()
 assert.deepEqual(asked, ['Brookswood', 'Langley'])
 assert.equal(near.listings[0].id, 'hf-n1', 'nearest first')

@@ -72,8 +72,8 @@ function RecenterOn({ place, listings }) {
   const map = useMap()
   const first = listings[0]?.id
   useEffect(() => {
-    if (!listings.length) return map.setView([place.lat, place.lng], 12)
-    map.fitBounds(listings.map(l => [l.lat, l.lng]), { padding: [40, 40], maxZoom: 14 })
+    if (!listings.length) map.setView([place.lat, place.lng], 12)
+    else map.fitBounds(listings.map(l => [l.lat, l.lng]), { padding: [40, 40], maxZoom: 14 })
   }, [place.id, first, map])
   return null
 }

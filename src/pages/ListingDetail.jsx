@@ -10,11 +10,13 @@ import './ListingDetail.css'
 export default function ListingDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { listings } = usePlace()
+  const { listings, fetching } = usePlace()
   const { language, t } = useI18n()
   const listing = listings.find(l => l.id === id)
   const { toggle, isFavorite } = useFavorites()
   const [photoIdx, setPhotoIdx] = useState(0)
+
+  if (!listing && fetching) return <div className="page" role="status" aria-busy="true" />
 
   if (!listing) {
     return (

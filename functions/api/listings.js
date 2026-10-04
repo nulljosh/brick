@@ -120,9 +120,9 @@ export async function onRequestGet({ request, env }) {
   }
   if (!Number.isFinite(p.lat) || !Number.isFinite(p.lng)) return Response.json({ error: 'lat and lng required' }, { status: 400 })
 
-  const key = new Request(`${new URL(request.url).origin}/_c2/${p.country}/${p.city}/${p.area}/${p.lat.toFixed(1)}/${p.lng.toFixed(1)}/${p.mode}`)
-  const hit = await caches.default.match(key)
-  if (hit) return hit
+  const key = `v2/${p.country}/${p.city}/${p.area}/${p.lat.toFixed(1)}/${p.lng.toFixed(1)}/${p.mode}`.toLowerCase()
+  const hit = await env.BRICK_CACHE?.get(key)
+  if (hit) return new Response(hit, { headers: { 'content-type': 'application/json', 'cache-control': `public, max-age=${TTL}` } })
 
   const sources = {}
   const out = (await Promise.all(PROVIDERS.map(async fn => {
@@ -145,6 +145,7 @@ export async function onRequestGet({ request, env }) {
     return !seen.has(k) && seen.add(k)
   })
   const res = Response.json({ listings: unique, sources, modes }, { headers: { 'cache-control': `public, max-age=${unique.length ? TTL : 300}` } })
-  await caches.default.put(key, res.clone())
+  // Errors and empty answers are not cached for long, so a feed hiccup heals itself.
+  if (unique.length) await env.BRICK_CACHE?.put(key, JSON.stringify({ listings: unique, sources, modes }), { expirationTtl: TTL })
   return res
 }

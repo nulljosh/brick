@@ -41,6 +41,7 @@ export const en = {
   year_built: 'Year built',
   approx_locations: 'Map data is unavailable right now, so these homes are placed approximately.',
   live_listings: 'Real rentals in Vancouver, live from the feed.',
+  fetching_listings: 'Pulling live listings for {place}. The first look at a new place takes a few seconds.',
   sample_listings: 'Sample listings generated for exploration. These are not homes for sale or rent.',
   no_results: 'No listings found',
   adjust_filters: 'Try adjusting your filters or search another place',

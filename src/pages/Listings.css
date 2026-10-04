@@ -47,3 +47,22 @@
   font-size: 0.875rem;
   color: var(--text2);
 }
+
+.listing-card.skeleton {
+  min-height: 320px;
+  background: linear-gradient(100deg, var(--bg2) 40%, var(--surface) 50%, var(--bg2) 60%) 0 0 / 300% 100%;
+  animation: shimmer 1.4s linear infinite;
+}
+
+.listings-fetching::before {
+  content: '';
+  display: inline-block;
+  width: 8px; height: 8px;
+  margin-inline-end: 0.6rem;
+  border-radius: 50%;
+  background: var(--clay);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse { from { opacity: 0.3; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .listing-card.skeleton, .listings-fetching::before { animation: none; } }

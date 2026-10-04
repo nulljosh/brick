@@ -77,7 +77,9 @@ export async function searchPlaces(query, language = 'en', signal) {
   const res = await fetch(url, { signal, headers: { Accept: 'application/json' } })
   if (!res.ok) throw new Error(`Place search failed: ${res.status}`)
   const rows = await res.json()
-  return rows.filter(r => r.boundingbox).map(toPlace)
+  // Nominatim returns the same suburb as a boundary and as a node; keep one.
+  const seen = new Set()
+  return rows.filter(r => r.boundingbox).map(toPlace).filter(p => !seen.has(p.label) && seen.add(p.label))
 }
 
 // Real named streets inside the place, in the local script. Returns
