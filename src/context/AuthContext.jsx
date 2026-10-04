@@ -43,15 +43,18 @@ function mapUser(sbUser) {
 
 const AuthContext = createContext(null)
 
+// Local QA only: `npm run dev` then /browse?preview. Vite drops this from builds.
+const preview = import.meta.env.DEV && new URLSearchParams(location.search).has('preview')
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(preview ? mapUser({ id: 'preview', email: 'preview@localhost' }) : null)
   // getSession is async, so until it answers we do not know whether there is a
   // session. Routing on `user` alone bounced signed-in people to /login on any
   // refresh or deep link.
-  const [ready, setReady] = useState(!authConfigured)
+  const [ready, setReady] = useState(!authConfigured || preview)
 
   useEffect(() => {
-    if (!authConfigured) return
+    if (!authConfigured || preview) return
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(mapUser(session?.user ?? null))
       setReady(true)

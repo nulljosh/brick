@@ -1,0 +1,7 @@
+name = "roost"
+pages_build_output_dir = "dist"
+compatibility_date = "2026-09-01"
+
+# Workers AI for /api/ask. Listing keys stay as Pages secrets.
+[ai]
+binding = "AI"

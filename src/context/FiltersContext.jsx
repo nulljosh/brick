@@ -38,13 +38,19 @@ export function FiltersProvider({ children }) {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
+  // AI mode answers with a whole filter set, so it replaces rather than merges.
+  function applyFilters(next) {
+    touched.current = true
+    setFilters(prev => ({ ...defaultFilters, favoritesOnly: prev.favoritesOnly, ...next }))
+  }
+
   function resetFilters() {
     touched.current = true
     setFilters(defaultFilters)
   }
 
   return (
-    <FiltersContext.Provider value={{ filters, updateFilter, resetFilters }}>
+    <FiltersContext.Provider value={{ filters, updateFilter, applyFilters, resetFilters }}>
       {children}
     </FiltersContext.Provider>
   )

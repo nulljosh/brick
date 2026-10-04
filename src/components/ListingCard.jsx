@@ -31,7 +31,10 @@ export default function ListingCard({ listing, index = 0 }) {
         {listing.listedDaysAgo <= 3 && <span className="listing-new-badge">{t('new_badge')}</span>}
       </div>
       <div className="listing-card-body">
-        <div className="listing-price">{fmt.price}</div>
+        <div className="listing-price">
+          {fmt.price}
+          {listing.deal >= 5 && <span className="deal-badge">{t('deal_under', { n: listing.deal })}</span>}
+        </div>
         <div className="listing-meta">
           <span>{listing.beds} {t('bd')}</span>
           <span className="meta-dot" />

@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { filterListings } from '../lib/filterListings'
 import { useFilters } from '../context/FiltersContext'
 import { useFavorites } from '../context/FavoritesContext'
@@ -7,6 +7,8 @@ import { useI18n } from '../i18n'
 import FilterBar from '../components/FilterBar'
 import MapView from '../components/MapView'
 import ListingCard from '../components/ListingCard'
+import AskBar from '../components/AskBar'
+import { scoreDeals } from '../lib/deals'
 import './Listings.css'
 
 export default function Listings() {
@@ -15,18 +17,21 @@ export default function Listings() {
   const { place, listings, isLive, streetsUnavailable } = usePlace()
   const { t } = useI18n()
 
+  const [askCount, setAskCount] = useState(0)
+  const scored = useMemo(() => scoreDeals(listings), [listings])
   const filtered = useMemo(
-    () => filterListings(listings, filters, favoriteSet),
-    [listings, filters, favoriteSet]
+    () => filterListings(scored, filters, favoriteSet),
+    [scored, filters, favoriteSet]
   )
 
   return (
     <div className="page">
+      <AskBar resultCount={filtered.length} onAnswer={() => setAskCount(n => n + 1)} />
       <FilterBar resultCount={filtered.length} />
       {!isLive && <p className="listings-notice">{t('sample_listings')}</p>}
       {!isLive && streetsUnavailable && <p className="listings-notice">{t('approx_locations')}</p>}
       <MapView listings={filtered} favorites={favorites} place={place} />
-      <div className="listings-grid">
+      <div className="listings-grid" key={askCount}>
         {filtered.map((listing, i) => (
           <ListingCard key={listing.id} listing={listing} index={i} />
         ))}

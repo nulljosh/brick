@@ -27,8 +27,9 @@ function roundNice(n) {
 }
 
 const bedOptions = [0, 1, 2, 3, 4]
-const sortOptions = ['price-asc', 'price-desc', 'newest', 'sqft-desc']
+const sortOptions = ['deal', 'price-asc', 'price-desc', 'newest', 'sqft-desc']
 const sortKeys = {
+  deal: 'sort_deal',
   'price-asc': 'sort_price_asc',
   'price-desc': 'sort_price_desc',
   newest: 'sort_newest',

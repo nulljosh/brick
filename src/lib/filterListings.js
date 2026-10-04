@@ -19,6 +19,9 @@ export function filterListings(listings, filters, favoriteSet = new Set()) {
     case 'newest':
       result.sort((a, b) => a.listedDaysAgo - b.listedDaysAgo)
       break
+    case 'deal':
+      result.sort((a, b) => (b.deal ?? 0) - (a.deal ?? 0))
+      break
     case 'sqft-desc':
       result.sort((a, b) => b.sqft - a.sqft)
       break
